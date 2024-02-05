@@ -32,6 +32,7 @@ import android.media.Image
 import android.media.ImageReader
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
@@ -387,9 +388,9 @@ class CameraFragment : Fragment() {
                         }
 
                         // Compute EXIF orientation metadata
-                        val rotation = relativeOrientation.value ?: 0
+                        val rotation = if (isBambiDevice()) 270 else (relativeOrientation.value ?: 0)
                         val mirrored = characteristics.get(CameraCharacteristics.LENS_FACING) ==
-                                CameraCharacteristics.LENS_FACING_FRONT
+                                CameraCharacteristics.LENS_FACING_FRONT || isBambiDevice()
                         val exifOrientation = computeExifOrientation(rotation, mirrored)
 
                         // Build the result and resume progress
@@ -463,6 +464,17 @@ class CameraFragment : Fragment() {
         super.onDestroyView()
     }
 
+    private fun isBambiDevice(): Boolean {
+        /* Spock Device Specs */
+        Log.d(TAG, "Device Model = ${Build.MODEL}")  // bambi
+        Log.d(TAG, "Device Brand = ${Build.BRAND}")  // alps
+        /*Log.d(TAG, "Device Manufacturer = ${Build.MANUFACTURER}")  // alps
+        Log.d(TAG, "Device Product = ${Build.PRODUCT}")  //vnd_bambi
+        Log.d(TAG, "Device Hardware = ${Build.HARDWARE}")  // mt6725*/
+
+        return ((Build.BRAND == "alps") || (Build.MODEL == "bambi"))
+    }
+
     companion object {
         private val TAG = CameraFragment::class.java.simpleName
 
@@ -489,7 +501,9 @@ class CameraFragment : Fragment() {
          */
         private fun createFile(context: Context, extension: String): File {
             val sdf = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.US)
-            return File(context.filesDir, "IMG_${sdf.format(Date())}.$extension")
+            val customDir = File(Environment.getExternalStorageDirectory().toString() + File.separator + "TestPics")
+            customDir.mkdirs()
+            return File(customDir, "IMG_${sdf.format(Date())}.$extension")
         }
     }
 }

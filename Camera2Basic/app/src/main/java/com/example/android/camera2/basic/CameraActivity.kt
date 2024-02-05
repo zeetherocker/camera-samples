@@ -17,6 +17,8 @@
 package com.example.android.camera2.basic
 
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.android.camera2.basic.databinding.ActivityCameraBinding
@@ -38,6 +40,11 @@ class CameraActivity : AppCompatActivity() {
         activityCameraBinding.fragmentContainer.postDelayed({
             activityCameraBinding.fragmentContainer.systemUiVisibility = FLAGS_FULLSCREEN
         }, IMMERSIVE_FLAG_TIMEOUT)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        Log.d("KeyTest", "onKeyDown $keyCode $event")
+        return super.onKeyDown(keyCode, event)
     }
 
     companion object {

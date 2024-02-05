@@ -54,17 +54,25 @@ class SelectorFragment : Fragment() {
 
             val cameraList = enumerateCameras(cameraManager)
 
+            if (cameraList.size == 1) {
+                switchToSelectedCamera(cameraList[0].cameraId, cameraList[0].format)
+                return
+            }
+
             val layoutId = android.R.layout.simple_list_item_1
             adapter = GenericListAdapter(cameraList, itemLayoutId = layoutId) { view, item, _ ->
                 view.findViewById<TextView>(android.R.id.text1).text = item.title
                 view.setOnClickListener {
-                    Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                            .navigate(SelectorFragmentDirections.actionSelectorToCamera(
-                                    item.cameraId, item.format))
+                    switchToSelectedCamera(item.cameraId, item.format)
                 }
             }
         }
+    }
 
+    private fun switchToSelectedCamera(cameraId: String, format: Int) {
+        Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                .navigate(SelectorFragmentDirections.actionSelectorToCamera(
+                        cameraId, format))
     }
 
     companion object {
